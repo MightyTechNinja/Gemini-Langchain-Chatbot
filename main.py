@@ -18,7 +18,7 @@ from langchain_google_genai import GoogleGenerativeAIEmbeddings
 from dotenv import load_dotenv
 
 
-API_KEY = 'AIzaSyAaBfBlz2WJx2oz9d2s11ufTubrjJADB0M'
+API_KEY = 'Enter your API Key'
 genai.configure(api_key=os.getenv("API_KEY"))
 
 
