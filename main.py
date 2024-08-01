@@ -1,6 +1,5 @@
 import numpy as np
 import pandas as pd
-
 import google.generativeai as genai
 import json
 import os
@@ -17,11 +16,10 @@ from langchain_text_splitters import RecursiveCharacterTextSplitter
 from langchain_google_genai import GoogleGenerativeAIEmbeddings
 from dotenv import load_dotenv
 
-
 API_KEY = 'Enter your API Key'
 genai.configure(api_key=os.getenv("API_KEY"))
 
-
+# extracting text from the pdf 
 pdf_file = open('test2.pdf', 'rb')
 pdf_reader = PyPDF2.PdfReader(pdf_file)
 num_pages = len(pdf_reader.pages)
@@ -29,28 +27,26 @@ text = ''
 for page_num in range(num_pages):
     page = pdf_reader.pages[page_num]
     text += page.extract_text()
-
 pdf_file.close()
-
 print(text)
 
-
+# creating chunks out of text
 text_splitter = RecursiveCharacterTextSplitter(
     chunk_size=100,
     chunk_overlap=20,
     length_function=len,
     is_separator_regex=False,
 )
-
 chunks = text_splitter.split_text(text)
 print(chunks[0])
 len(chunks)
 
+# Embed the text
 embedding_model = GoogleGenerativeAIEmbeddings(model="models/embedding-001", google_api_key=API_KEY)
 embeddings = embedding_model.embed_documents(chunks)
 embeddings[0]
 
-
+# saving the embeddings in json format 
 def save_chunks_and_embeddings_to_json(chunks, embeddings, output_file):
     data = []
     for i, chunk in enumerate(chunks):
@@ -61,7 +57,6 @@ def save_chunks_and_embeddings_to_json(chunks, embeddings, output_file):
 
     with open(output_file, 'w', encoding='utf-8') as f:
         json.dump(data, f, ensure_ascii=False, indent=2)
-
 
 save_chunks_and_embeddings_to_json(chunks,embeddings,'chunksandembeddings.json')
 
@@ -74,13 +69,12 @@ index = faiss.IndexFlatL2(embeddings_np.shape[1])
 index.add(embeddings_np)
 faiss.write_index(index, 'faiss_index.index')
 
-
 index = faiss.read_index("faiss_index.index")
 
 with open("chunksandembeddings.json", "r",encoding="utf-8") as f:
     data = json.load(f)
     chunks1 = [item['chunk'] for item in data]
-    
+
 llm = ChatGoogleGenerativeAI(model="gemini-pro", google_api_key=API_KEY)
 prompt_template = """You are a helpful assistant that answers questions based on the provided context. and you can be creative if necessary
 Context: {context}
@@ -91,7 +85,7 @@ prompt = PromptTemplate(template=prompt_template, input_variables=["context", "q
 
 chain = LLMChain(llm=llm, prompt=prompt)
 
-
+#chatbot
 def app():
     st.title("PDF Chatbot")
     query = st.text_input("Enter your query")
@@ -114,15 +108,8 @@ def app():
         sorted_texts = [chunks1[relevant_indices[idx]] for idx in sorted_indices]
 
         context = " ".join(sorted_texts)
-
-        # similarity_scores = cosine_similarity(query_embedding_array, chunks1)
-        # relevant_chunk_indices = np.argsort(similarity_scores[0])[-5:][::-1]
-        # relevant_chunk = "\n\n".join([chunks[i].page_content for i in relevant_chunk_indices])
-        # context =relevant_chunk
-        # context = " ".join(relevant_texts)
-        # response = ai21.complete(query=query, context=context, maxTokens=150, topKReturn=1, temperature=0.1)
         response = chain.run(context=context, question=query)
         st.write(response)
 
 if __name__ == "__main__":
-    app()
+    app()        
