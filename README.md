@@ -11,13 +11,13 @@ I Extracted a small part of a story, it is attached in the repo. Feel free to gi
 # Procedure 
 ![image](https://github.com/user-attachments/assets/8cbebdf2-7dac-439b-bb4b-bb2fc026a23d)
 
-## Backend Process 
+### Backend Process 
 1. **Text Input** : The text is extracted from a PDF by the PyPDF2.PdfReader library
 2. **Text Chunking** : the text is divided into smaller segements called chunks by using the Recursive Character Text Splitter.
 3. **Embedding Generation** : All the chunks are converted to embeddings uding the Google Generative AI Embedding API
 4. **Storing Embeddings** : All the embeddings are converted into json format and stored using the FAISS indexing for easy retrieval.
 
-## Frontend Process 
+### Frontend Process 
 For the frontend part of the project Streamlit is used 
 1. **Query Input** : Using the streamlit Input the user can give the query or ask the Question regarding the trained document.
 2. **Query Embedding** : the query is converted into embeddings using the same method as earlier
