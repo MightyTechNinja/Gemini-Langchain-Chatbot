@@ -24,4 +24,5 @@ For the frontend part of the project Streamlit is used
 3. **Similarity Search** : A search is run throught the stored embeddings to find the context related to the Query embeddings.
 4. **API Respones Generation** : Based on the Query, Context and the Prompt the Api generates a response.
 5. **Output Generation** : The Output given by the API is displayed on the frontend page.
-6.  
+
+
